@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
   const [alert, setAlert] = useState(null);
+  const [isError, setError] = useState(null);
 
   useEffect(() => {
     Services.getAll().then((response) => setPersons(response));
@@ -28,8 +29,12 @@ const App = () => {
       Services.create(newPerson)
         .then((response) => {
           setPersons(persons.concat(response));
+          setAlertTime(`${newPerson.name} was added`);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error);
+          setErrorTime(error.message);
+        });
     } else if (
       window.confirm(
         `${newPerson.name} is already added in the phonebook, replace the old number with a new one?`
@@ -43,8 +48,12 @@ const App = () => {
               person.id !== response.id ? person : response
             )
           );
+          setAlertTime(`New number for ${newPerson.name} was added`);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error);
+          setErrorTime(error.message);
+        });
     }
 
     setNewName("");
@@ -54,15 +63,29 @@ const App = () => {
   const removePerson = (id) => {
     const name = persons.find((person) => person.id === id).name;
     if (window.confirm(`Delete ${name}`)) {
-      Services.remove(id).then(
-        setPersons(persons.filter((person) => person.name !== name))
-      );
+      Services.remove(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.name !== name));
+          setAlertTime(`${name} was deleted`);
+        })
+        .catch(() => {
+          setErrorTime(
+            `Information of ${name} has already been removed from server`
+          );
+        });
     }
   };
 
   const setAlertTime = (text) => {
     setAlert(text);
     setTimeout(() => setAlert(null), 5000);
+  };
+
+  const setErrorTime = (text) => {
+    setError(true);
+    setAlert(text);
+    setTimeout(() => setAlert(null), 5000);
+    setTimeout(() => setError(null), 5000);
   };
 
   const handleFilterChange = (event) => {
@@ -80,7 +103,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Alert alert={alert} />
+      <Alert alert={alert} isError={isError} />
       <Filter filter={newFilter} handlerFilter={handleFilterChange} />
 
       <h3>Add a new</h3>
