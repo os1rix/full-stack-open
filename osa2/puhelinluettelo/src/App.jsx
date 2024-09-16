@@ -41,6 +41,7 @@ const App = () => {
       )
     ) {
       const id = persons.find((person) => person.name == newPerson.name).id;
+      console.log(id);
       Services.update(id, newPerson)
         .then((response) => {
           setPersons(
@@ -62,9 +63,12 @@ const App = () => {
 
   const removePerson = (id) => {
     const name = persons.find((person) => person.id === id).name;
+    console.log(name);
     if (window.confirm(`Delete ${name}`)) {
+      console.log("moro");
       Services.remove(id)
         .then(() => {
+          console.log("wassup");
           setPersons(persons.filter((person) => person.name !== name));
           setAlertTime(`${name} was deleted`);
         })
