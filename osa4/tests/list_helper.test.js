@@ -94,31 +94,43 @@ describe("favorite blog", () => {
   }
   test("many blogs", () => {
     const result = listHelper.favoriteBlog(listWithManyBlogs)
-    expect(result).toEqual(favorite)
+    assert.deepStrictEqual(result, favorite)
   })
   test("no blogs", () => {
     const noBlogs = []
     const result = listHelper.favoriteBlog(noBlogs)
-    expect(result).toEqual(favorite)
+    assert.deepStrictEqual(result, null)
   })
 })
 
 describe("most blogs", () => {
   const favorite = {
-    _id: "5a422b3a1b54a676234d17f9",
-    title: "Canonical string reduction",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-    likes: 12,
-    __v: 0,
+    author: "Robert C. Martin",
+    blogs: 3,
   }
   test("many blogs", () => {
-    const result = listHelper.favoriteBlog(listWithManyBlogs)
-    expect(result).toEqual(favorite)
+    const result = listHelper.mostBlogs(listWithManyBlogs)
+    assert.deepStrictEqual(result, favorite)
   })
   test("no blogs", () => {
     const noBlogs = []
-    const result = listHelper.favoriteBlog(noBlogs)
-    expect(result).toEqual(favorite)
+    const result = listHelper.mostBlogs(noBlogs)
+    assert.deepStrictEqual(result, null)
+  })
+})
+
+describe("most likes", () => {
+  const favorite = {
+    author: "Edsger W. Dijkstra",
+    likes: 17,
+  }
+  test("many blogs", () => {
+    const result = listHelper.mostLikes(listWithManyBlogs)
+    assert.deepStrictEqual(result, favorite)
+  })
+  test("no blogs", () => {
+    const noBlogs = []
+    const result = listHelper.mostLikes(noBlogs)
+    assert.deepStrictEqual(result, null)
   })
 })
