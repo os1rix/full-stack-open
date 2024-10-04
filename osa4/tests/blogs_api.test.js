@@ -3,10 +3,11 @@ const supertest = require("supertest")
 const assert = require("node:assert")
 const { test, after, beforeEach, describe } = require("node:test")
 const app = require("../app")
-
 const api = supertest(app)
-
 const Blog = require("../models/blog")
+const User = require("../models/user")
+const { initialUsersGenerator, getTokenFor } = require("./test_helper")
+const blog = require("../models/blog")
 
 const exampleBlogs = [
   {
@@ -23,12 +24,20 @@ const exampleBlogs = [
   },
 ]
 
+const associateBlogsWithUsers = (blogs, users) => {
+  return blogs.map((blog, index) => ({
+    ...blog,
+    user: users[index % users.length]._id,
+  }))
+}
+
 beforeEach(async () => {
+  await User.deleteMany({})
+  await User.insertMany(await initialUsersGenerator())
   await Blog.deleteMany({})
-  let blogObject = new Blog(exampleBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(exampleBlogs[1])
-  await blogObject.save()
+
+  const addedUsers = await User.find({})
+  await Blog.inserMany(associateBlogsWithUsers(exampleBlogs, addedUsers))
 })
 
 describe("GET-request", () => {
@@ -52,6 +61,9 @@ describe("GET-request", () => {
 
 describe("POST-request", () => {
   test("POST works correctly", async () => {
+    const user = await User.findOne({})
+    const usersToken = getTokenFor(user)
+
     const testBlog = {
       title: "First class tests",
       author: "Robert C. Martin",
@@ -62,6 +74,7 @@ describe("POST-request", () => {
     await api
       .post("/api/blogs")
       .send(testBlog)
+      .set({ Authorization: `bearer ${usersToken}` })
       .expect(201)
       .expect("Content-Type", /application\/json/)
 
@@ -73,6 +86,8 @@ describe("POST-request", () => {
   })
 
   test("Value of 'likes' is 0 when not given", async () => {
+    const user = await User.findOne({})
+    const usersToken = getTokenFor(user)
     const testBlog = {
       title: "First class tests",
       author: "Robert C. Martin",
@@ -82,6 +97,7 @@ describe("POST-request", () => {
     await api
       .post("/api/blogs")
       .send(testBlog)
+      .set({ Authorization: `bearer ${usersToken}` })
       .expect(201)
       .expect("Content-Type", /application\/json/)
 
@@ -91,23 +107,46 @@ describe("POST-request", () => {
     assert(allLikes.includes(0))
   })
   test("No URL given", async () => {
+    const user = await User.findOne({})
+    const usersToken = getTokenFor(user)
     const testBlog = {
       title: "First class tests",
       author: "Robert C. Martin",
       likes: 10,
     }
 
-    await api.post("/api/blogs").send(testBlog).expect(400)
+    await api
+      .post("/api/blogs")
+      .send(testBlog)
+      .set({ Authorization: `bearer ${usersToken}` })
+      .expect(400)
   })
 
   test("No TITLE given", async () => {
+    const user = await User.findOne({})
+    const usersToken = getTokenFor(user)
     const testBlog = {
       author: "Robert C. Martin",
       url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
       likes: 10,
     }
 
-    await api.post("/api/blogs").send(testBlog).expect(400)
+    await api
+      .post("/api/blogs")
+      .send(testBlog)
+      .set({ Authorization: `bearer ${usersToken}` })
+      .expect(400)
+  })
+  test("No token or token undefined", async () => {
+    const testBlog = {
+      author: "Robert C. Martin",
+      url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+      likes: 10,
+    }
+
+    const response = await api.post("/api/blogs").send(testBlog).expect(401)
+
+    assert.strictEqual(response.body.error, "invalid token")
   })
 })
 
@@ -115,8 +154,13 @@ describe("DELETE-request", () => {
   test("DELETE gives right status and decreases the list size", async () => {
     const blogsAtStart = await api.get("/api/blogs")
     const blogToDelete = blogsAtStart.body[0]
+    const user = await User.findById(blogToDelete.user.id)
+    const usersToken = getTokenFor(user)
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({ Authorization: `bearer ${usersToken}` })
+      .expect(204)
 
     const blogsAtEnd = await api.get("/api/blogs")
     assert.strictEqual(blogsAtEnd.body.length, blogsAtStart.body.length - 1)
