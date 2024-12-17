@@ -7,7 +7,6 @@ const api = supertest(app)
 const Blog = require("../models/blog")
 const User = require("../models/user")
 const { initialUsersGenerator, getTokenFor } = require("./test_helper")
-const blog = require("../models/blog")
 
 const exampleBlogs = [
   {
@@ -33,11 +32,12 @@ const associateBlogsWithUsers = (blogs, users) => {
 
 beforeEach(async () => {
   await User.deleteMany({})
-  await User.insertMany(await initialUsersGenerator())
-  await Blog.deleteMany({})
-
+  const users = await initialUsersGenerator()
+  await User.insertMany(users)
   const addedUsers = await User.find({})
-  await Blog.inserMany(associateBlogsWithUsers(exampleBlogs, addedUsers))
+
+  await Blog.deleteMany({})
+  await Blog.insertMany(associateBlogsWithUsers(exampleBlogs, addedUsers))
 })
 
 describe("GET-request", () => {

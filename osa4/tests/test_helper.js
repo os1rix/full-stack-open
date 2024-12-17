@@ -5,14 +5,14 @@ const jwt = require("jsonwebtoken")
 const initialUsersGenerator = async () => {
   const exampleUsers = [
     {
-      username: "osq",
-      name: "Oskari Silvoniemi",
-      password: "1234567890",
+      username: "osqu",
+      name: "Oskari Salvoniemi",
+      password: "1234567890000",
     },
     {
-      username: "matti",
-      name: "Matti Meikäläinen",
-      password: "mattopeitto",
+      username: "motti",
+      name: "Motti Meikäläinen",
+      password: "peittomatto",
     },
   ]
   const saltRounds = 10
@@ -31,6 +31,9 @@ const initialUsersGenerator = async () => {
 }
 
 const getTokenFor = (user) => {
+  if (!user) {
+    throw new Error("User not found")
+  }
   return jwt.sign({ username: user.username, id: user._id }, process.env.SECRET)
 }
 

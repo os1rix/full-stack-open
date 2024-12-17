@@ -26,13 +26,11 @@ beforeEach(async () => {
   const hashedPasswords = await Promise.all(
     exampleUsers.map((user) => bcrypt.hash(user.password, saltRounds))
   )
-  const users = exampleUsers.map((user, index) => {
-    return {
-      username: user.username,
-      name: user.name,
-      passwordHash: hashedPasswords[index],
-    }
-  })
+  const users = exampleUsers.map((user, index) => ({
+    username: user.username,
+    name: user.name,
+    passwordHash: hashedPasswords[index],
+  }))
   await User.insertMany(users)
 })
 
@@ -73,7 +71,7 @@ describe("POST-request", () => {
     const allTitles = response.body.map((user) => user.username)
 
     assert.strictEqual(response.body.length, exampleUsers.length + 1)
-    assert(allTitles.includes(testUser.title))
+    assert(allTitles.includes(testUser.username))
   })
   test("Error and 400 when no username given", async () => {
     const testUser = {
@@ -83,7 +81,7 @@ describe("POST-request", () => {
 
     const response = await api.post("/api/users").send(testUser).expect(400)
 
-    assert.strictEqual(response.body.error.message, "Username is required")
+    assert.strictEqual(response.body.error, "Username is required")
     const GETresponse = await api.get("/api/users")
     assert.strictEqual(GETresponse.body.length, exampleUsers.length)
   })
@@ -95,7 +93,7 @@ describe("POST-request", () => {
 
     const response = await api.post("/api/users").send(testUser).expect(400)
 
-    assert.strictEqual(response.body.error.message, "Password is required")
+    assert.strictEqual(response.body.error, "Password is required")
     const GETresponse = await api.get("/api/users")
     assert.strictEqual(GETresponse.body.length, exampleUsers.length)
   })
@@ -107,12 +105,12 @@ describe("POST-request", () => {
 
     const response = await api.post("/api/users").send(testUser).expect(400)
 
-    assert.strictEqual(response.body.error.message, "Name is required")
+    assert.strictEqual(response.body.error, "Name is required")
     const GETresponse = await api.get("/api/users")
     assert.strictEqual(GETresponse.body.length, exampleUsers.length)
   })
 })
 
-after(() => {
+after(async () => {
   mongoose.connection.close()
 })
