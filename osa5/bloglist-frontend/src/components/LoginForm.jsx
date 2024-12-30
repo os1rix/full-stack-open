@@ -14,6 +14,10 @@ const LoginForm = ({ setUser }) => {
       setPassword("")
     } catch (exception) {
       console.error("Wrong credentials")
+      setErrorMessage("Wrong Credentials")
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 

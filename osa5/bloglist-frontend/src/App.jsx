@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
 import LoginForm from "./components/LoginForm"
+import BlogForm from "./components/BlogForm"
 import blogService from "./services/blogs"
 
 const App = () => {
@@ -16,12 +17,15 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
-    </div>
+    <>
+      <BLogform />
+      <div>
+        <h2>blogs</h2>
+        {blogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} />
+        ))}
+      </div>
+    </>
   )
 }
 
