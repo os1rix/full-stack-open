@@ -1,23 +1,34 @@
 import { useState } from "react"
 import loginService from "../services/login"
+import blogService from "../services/blogs"
 
-const LoginForm = ({ setUser }) => {
+const LoginForm = ({ setUser, setErrorMessage, setSuccessMessage }) => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
+      const loggedUser = {
+        loggedUsername: username,
+        loggedPassword: password,
+      }
+      const user = await loginService.login(loggedUser)
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user))
+      blogService.setToken(user.token)
       setUser(user)
       setUsername("")
       setPassword("")
+      setSuccessMessage("Logged in!")
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 3000)
     } catch (exception) {
-      console.error("Wrong credentials")
-      setErrorMessage("Wrong Credentials")
+      console.error("Wrong credentials!")
+      setErrorMessage("Wrong credentials!")
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000)
+      }, 3000)
     }
   }
 
@@ -35,7 +46,7 @@ const LoginForm = ({ setUser }) => {
       <div>
         password
         <input
-          type="password"
+          type="text"
           value={password}
           onChange={({ target }) => setPassword(target.value)}
         />
