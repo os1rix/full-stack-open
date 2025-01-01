@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Blog from "./components/Blog"
 import LoginForm from "./components/LoginForm"
 import BlogForm from "./components/BlogForm"
 import blogService from "./services/blogs"
 import Message from "./components/Message"
+import Togglable from "./components/Togglable"
 import "./App.css"
 
 const App = () => {
@@ -14,6 +15,35 @@ const App = () => {
 
   const logOut = () => {
     window.localStorage.removeItem("loggedBlogappUser")
+  }
+
+  const blogFormRef = useRef()
+
+  const handleSubmit = (event) => {
+    try {
+      event.preventDefault()
+      const newBlog = {
+        title: title,
+        author: author,
+        user: user.name,
+        url: url,
+        likes: 0,
+      }
+      blogService.create(newBlog)
+      blogFormRef.current.toggleVisibility()
+      setTitle("")
+      setAuthor("")
+      setUrl("")
+      setSuccessMessage(`New blog "${newBlog.title}" posted succesfully!`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 3000)
+    } catch (exception) {
+      setErrorMessage("Error in posting the blog!")
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
+    }
   }
 
   useEffect(() => {
@@ -54,15 +84,18 @@ const App = () => {
           <button onClick={logOut}>logout</button>
         </p>
       </div>
-      <BlogForm
-        user={user}
-        setErrorMessage={setErrorMessage}
-        setSuccessMessage={setSuccessMessage}
-      />
+      <Togglable buttonLabel="new note" ref={blogFormRef}>
+        <BlogForm handleSubmit={handleSubmit} />
+      </Togglable>
       <br />
       <div>
         {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          <p>
+            {blog.title}
+            <Togglable buttonLabel="view">
+              <Blog key={blog.id} blog={blog} />
+            </Togglable>
+          </p>
         ))}
       </div>
     </>

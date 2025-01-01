@@ -1,30 +1,10 @@
 import { useState } from "react"
 import blogService from "../services/blogs"
 
-const BlogForm = ({ user, setSuccessMessage, setErrorMessage }) => {
+const BlogForm = ({ handleSubmit }) => {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
-
-  const handleSubmit = (event) => {
-    try {
-      event.preventDefault()
-      const newBlog = {
-        title: title,
-        author: author,
-        user: user.name,
-        url: url,
-        likes: 0,
-      }
-      blogService.create(newBlog)
-      setTitle("")
-      setAuthor("")
-      setUrl("")
-      setSuccessMessage(`New blog "${newBlog.title}" posted succesfully!`)
-    } catch (exception) {
-      setErrorMessage("Error in posting the blog!")
-    }
-  }
 
   return (
     <div>
