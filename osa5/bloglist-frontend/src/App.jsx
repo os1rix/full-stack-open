@@ -12,6 +12,14 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const blogStyle = {
+    display: "block",
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+  }
 
   const logOut = () => {
     window.localStorage.removeItem("loggedBlogappUser")
@@ -19,21 +27,10 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (newBlog) => {
     try {
-      event.preventDefault()
-      const newBlog = {
-        title: title,
-        author: author,
-        user: user.name,
-        url: url,
-        likes: 0,
-      }
-      blogService.create(newBlog)
+      await blogService.create(newBlog)
       blogFormRef.current.toggleVisibility()
-      setTitle("")
-      setAuthor("")
-      setUrl("")
       setSuccessMessage(`New blog "${newBlog.title}" posted succesfully!`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -47,7 +44,10 @@ const App = () => {
   }
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    blogService.getAll().then((blogs) => {
+      blogs.sort((a, b) => b.likes - a.likes)
+      setBlogs(blogs)
+    })
   }, [])
 
   useEffect(() => {
@@ -85,16 +85,13 @@ const App = () => {
         </p>
       </div>
       <Togglable buttonLabel="new note" ref={blogFormRef}>
-        <BlogForm handleSubmit={handleSubmit} />
+        <BlogForm handleSubmit={handleSubmit} user={user} />
       </Togglable>
       <br />
       <div>
         {blogs.map((blog) => (
-          <p>
-            {blog.title}
-            <Togglable buttonLabel="view">
-              <Blog key={blog.id} blog={blog} />
-            </Togglable>
+          <p key={blog.id} style={blogStyle}>
+            <Blog blog={blog} setBlogs={setBlogs} />
           </p>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import React from "react"
+import PropTypes from "prop-types"
 
 const Message = ({ successMessage, errorMessage }) => {
   return (
@@ -15,6 +16,11 @@ const Message = ({ successMessage, errorMessage }) => {
       )}
     </div>
   )
+}
+
+Message.propTypes = {
+  successMessage: PropTypes.string,
+  errorMessage: PropTypes.string,
 }
 
 export default Message

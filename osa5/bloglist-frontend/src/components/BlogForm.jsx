@@ -1,15 +1,29 @@
 import { useState } from "react"
-import blogService from "../services/blogs"
+import PropTypes from "prop-types"
 
 const BlogForm = ({ handleSubmit }) => {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
 
+  const onSubmit = (event) => {
+    event.preventDefault()
+    const newBlog = {
+      title,
+      author,
+      url,
+      likes: 0,
+    }
+    handleSubmit(newBlog)
+    setTitle("")
+    setAuthor("")
+    setUrl("")
+  }
+
   return (
     <div>
       <h1>Create new</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit}>
         <div>
           <label>Title:</label>
           <input
@@ -38,6 +52,10 @@ const BlogForm = ({ handleSubmit }) => {
       </form>
     </div>
   )
+}
+
+BlogForm.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
 }
 
 export default BlogForm
