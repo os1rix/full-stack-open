@@ -25,6 +25,10 @@ const App = () => {
     window.localStorage.removeItem("loggedBlogappUser")
   }
 
+  const likeHandler = () => {
+    console.log("blog liked")
+  }
+
   const blogFormRef = useRef()
 
   const handleSubmit = async (newBlog) => {
@@ -91,7 +95,7 @@ const App = () => {
       <div>
         {blogs.map((blog) => (
           <p key={blog.id} style={blogStyle}>
-            <Blog blog={blog} setBlogs={setBlogs} />
+            <Blog blog={blog} setBlogs={setBlogs} likeHandler={likeHandler} />
           </p>
         ))}
       </div>

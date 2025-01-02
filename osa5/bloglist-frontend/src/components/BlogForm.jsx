@@ -9,9 +9,9 @@ const BlogForm = ({ handleSubmit }) => {
   const onSubmit = (event) => {
     event.preventDefault()
     const newBlog = {
-      title,
-      author,
-      url,
+      title: title,
+      author: author,
+      url: url,
       likes: 0,
     }
     handleSubmit(newBlog)
@@ -27,6 +27,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>Title:</label>
           <input
+            htmlFor="title"
             type="text"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
@@ -35,6 +36,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>Author:</label>
           <input
+            htmlFor="author"
             type="text"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
@@ -43,6 +45,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>URL:</label>
           <input
+            htmlFor="url"
             type="text"
             value={url}
             onChange={({ target }) => setUrl(target.value)}

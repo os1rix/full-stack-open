@@ -2,11 +2,12 @@ import { useState } from "react"
 import blogService from "../services/blogs"
 import PropTypes from "prop-types"
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, likeHandler }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
   const likeBlog = async () => {
+    likeHandler()
     try {
       const newBlog = {
         user: blog.user.id,
@@ -65,6 +66,7 @@ const Blog = ({ blog }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
+  likeHandler: PropTypes.func.isRequired,
 }
 
 export default Blog
