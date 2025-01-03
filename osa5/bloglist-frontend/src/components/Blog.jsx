@@ -2,15 +2,16 @@ import { useState } from "react"
 import blogService from "../services/blogs"
 import PropTypes from "prop-types"
 
-const Blog = ({ blog, likeHandler }) => {
+const Blog = ({ blog, likeHandler, setSuccessMessage, user, setBlogs }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
+  console.log(blog)
 
   const likeBlog = async () => {
     likeHandler()
     try {
       const newBlog = {
-        user: blog.user.id,
+        user: blog.user,
         likes: likes + 1,
         author: blog.author,
         title: blog.title,
@@ -27,7 +28,10 @@ const Blog = ({ blog, likeHandler }) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
       try {
         await blogService.Delete(blog.id)
+        setBlogs((prevBlogs) => prevBlogs.filter((b) => b.id !== blog.id))
+        setSuccessMessage("Blog removed successfully!")
       } catch (exception) {
+        console.log(exception)
         console.error("Error in removing the blog")
       }
   }
@@ -45,10 +49,12 @@ const Blog = ({ blog, likeHandler }) => {
           {likes}
           <button onClick={() => likeBlog()}>like</button>
         </p>
-        <p>{blog.user.name}</p>
-        <p>
-          <button onClick={() => removeBlog()}>remove</button>
-        </p>
+        <p>{blog.user.username}</p>
+        {user.username === blog.user.username && (
+          <p>
+            <button onClick={() => removeBlog()}>remove</button>
+          </p>
+        )}
       </div>
     )
   } else {

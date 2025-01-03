@@ -18,6 +18,7 @@ const LoginForm = ({ setUser, setErrorMessage, setSuccessMessage }) => {
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
+      console.log(user)
       setUsername("")
       setPassword("")
       setSuccessMessage("Logged in!")
@@ -39,6 +40,7 @@ const LoginForm = ({ setUser, setErrorMessage, setSuccessMessage }) => {
       <div>
         username
         <input
+          data-testid="username"
           type="text"
           value={username}
           onChange={({ target }) => setUsername(target.value)}
@@ -47,6 +49,7 @@ const LoginForm = ({ setUser, setErrorMessage, setSuccessMessage }) => {
       <div>
         password
         <input
+          data-testid="password"
           type="text"
           value={password}
           onChange={({ target }) => setPassword(target.value)}

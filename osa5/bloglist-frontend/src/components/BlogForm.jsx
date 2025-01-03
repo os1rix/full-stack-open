@@ -1,7 +1,7 @@
 import { useState } from "react"
 import PropTypes from "prop-types"
 
-const BlogForm = ({ handleSubmit }) => {
+const BlogForm = ({ handleSubmit, user }) => {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
@@ -9,6 +9,7 @@ const BlogForm = ({ handleSubmit }) => {
   const onSubmit = (event) => {
     event.preventDefault()
     const newBlog = {
+      user: user,
       title: title,
       author: author,
       url: url,
@@ -27,6 +28,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>Title:</label>
           <input
+            data-testid="title"
             htmlFor="title"
             type="text"
             value={title}
@@ -36,6 +38,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>Author:</label>
           <input
+            data-testid="author"
             htmlFor="author"
             type="text"
             value={author}
@@ -45,6 +48,7 @@ const BlogForm = ({ handleSubmit }) => {
         <div>
           <label>URL:</label>
           <input
+            data-testid="url"
             htmlFor="url"
             type="text"
             value={url}

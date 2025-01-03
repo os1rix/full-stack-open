@@ -9,6 +9,7 @@ import "./App.css"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  console.log(blogs)
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
@@ -33,7 +34,8 @@ const App = () => {
 
   const handleSubmit = async (newBlog) => {
     try {
-      await blogService.create(newBlog)
+      const createBlog = await blogService.create(newBlog)
+      setBlogs((prevBlogs) => [...prevBlogs, createBlog])
       blogFormRef.current.toggleVisibility()
       setSuccessMessage(`New blog "${newBlog.title}" posted succesfully!`)
       setTimeout(() => {
@@ -88,14 +90,20 @@ const App = () => {
           <button onClick={logOut}>logout</button>
         </p>
       </div>
-      <Togglable buttonLabel="new note" ref={blogFormRef}>
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <BlogForm handleSubmit={handleSubmit} user={user} />
       </Togglable>
       <br />
       <div>
-        {blogs.map((blog) => (
-          <p key={blog.id} style={blogStyle}>
-            <Blog blog={blog} setBlogs={setBlogs} likeHandler={likeHandler} />
+        {blogs.map((blog, index) => (
+          <p key={index} style={blogStyle}>
+            <Blog
+              blog={blog}
+              likeHandler={likeHandler}
+              setSuccessMessage={setSuccessMessage}
+              user={user}
+              setBlogs={setBlogs}
+            />
           </p>
         ))}
       </div>
