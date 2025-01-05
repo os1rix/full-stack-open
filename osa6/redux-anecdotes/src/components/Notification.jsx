@@ -4,11 +4,6 @@ import { changeNotification } from "../reducers/notificationReducer"
 const Notification = () => {
   const dispatch = useDispatch()
   const notification = useSelector((state) => state.notification)
-  if (notification) {
-    setTimeout(() => {
-      dispatch(changeNotification(""))
-    }, 5000)
-  }
 
   const style = {
     border: "solid",
