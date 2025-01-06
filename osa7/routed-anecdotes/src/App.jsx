@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react"
-
+import { useField } from "./customHooks"
 import { Routes, Route, Link, useNavigate, useParams } from "react-router-dom"
 
 const AnecdoteList = ({ anecdotes }) => (
@@ -64,19 +64,26 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState("")
-  const [author, setAuthor] = useState("")
-  const [info, setInfo] = useState("")
+  const content = useField("text")
+  const author = useField("text")
+  const info = useField("text")
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0,
     })
   }
+
+  // eslint-disable-next-line no-unused-vars
+  const { reset: contentReset, ...contentProps } = content
+  // eslint-disable-next-line no-unused-vars
+  const { reset: authorReset, ...authorProps } = author
+  // eslint-disable-next-line no-unused-vars
+  const { reset: infoReset, ...infoProps } = info
 
   return (
     <div>
@@ -84,29 +91,29 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...contentProps} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...authorProps} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...infoProps} />
         </div>
-        <button>create</button>
+        <p>
+          <button type="submit">create</button>
+          <button
+            type="button"
+            onClick={() => {
+              content.reset()
+              author.reset()
+              info.reset()
+            }}
+          >
+            reset
+          </button>
+        </p>
       </form>
     </div>
   )
